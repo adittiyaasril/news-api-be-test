@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  email    String   @unique
+  password String
+  role     Role     @default(USER)
+  news     News[]   @relation("UserNews")
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  news  News[]
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  publishedAt DateTime @default(now())
+  categoryId  Int
+  authorId    Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  author      User     @relation("UserNews", fields: [authorId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  USER
+}
